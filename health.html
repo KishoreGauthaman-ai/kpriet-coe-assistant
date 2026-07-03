@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriTrack</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a18;min-height:100vh}
+:root{--green:#22c55e;--blue:#3b82f6;--orange:#f97316;--red:#ef4444;--purple:#a855f7;--yellow:#eab308;--teal:#14b8a6;--radius:10px}
+
+/* ONBOARDING */
+#onboard{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.ob-card{background:#fff;border-radius:16px;padding:2.5rem;width:100%;max-width:480px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.ob-logo{font-size:28px;font-weight:700;color:#16a34a;margin-bottom:.25rem}
+.ob-sub{color:#666;font-size:14px;margin-bottom:2rem}
+.step{display:none}.step.active{display:block}
+.step-title{font-size:18px;font-weight:600;margin-bottom:1.5rem;color:#111}
+.field{margin-bottom:1.25rem}
+.field label{display:block;font-size:13px;font-weight:500;color:#444;margin-bottom:.4rem}
+.field input,.field select{width:100%;padding:.6rem .9rem;border:1.5px solid #e0e0e0;border-radius:var(--radius);font-size:15px;outline:none;transition:border .2s}
+.field input:focus,.field select:focus{border-color:#16a34a}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1.5rem}
+.goal-btn{border:1.5px solid #e0e0e0;background:#fff;border-radius:var(--radius);padding:1rem .5rem;text-align:center;cursor:pointer;transition:all .2s}
+.goal-btn i{font-size:28px;display:block;margin-bottom:.4rem}
+.goal-btn span{font-size:12px;font-weight:500;color:#444}
+.goal-btn.selected{border-color:#16a34a;background:#f0fdf4}
+.goal-btn.selected span{color:#16a34a}
+.ob-btn{width:100%;padding:.75rem;background:#16a34a;color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;margin-top:.5rem}
+.ob-btn:hover{background:#15803d}
+.activity-opts{display:grid;gap:.5rem;margin-bottom:1.5rem}
+.act-opt{display:flex;align-items:center;gap:.75rem;border:1.5px solid #e0e0e0;border-radius:var(--radius);padding:.6rem .9rem;cursor:pointer;transition:all .2s}
+.act-opt.selected{border-color:#16a34a;background:#f0fdf4}
+.act-opt i{font-size:18px;color:#888}
+.act-opt.selected i{color:#16a34a}
+.act-label{font-size:13px;font-weight:500;color:#444}
+.act-sub{font-size:11px;color:#888}
+.step-num{font-size:12px;color:#aaa;margin-bottom:.5rem}
+
+/* MAIN APP */
+#app{display:none;max-width:720px;margin:0 auto;padding:1rem}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0 1rem}
+.top-logo{font-size:20px;font-weight:700;color:#16a34a}
+.top-date{font-size:13px;color:#888}
+.plan-badge{display:inline-flex;align-items:center;gap:.4rem;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;border-radius:99px;padding:.3rem .8rem;font-size:12px;font-weight:600;margin-bottom:1rem}
+.cal-card{background:#fff;border-radius:16px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.cal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom.75rem}
+.cal-main{display:flex;align-items:center;gap:1.25rem}
+.cal-ring{position:relative;width:100px;height:100px;flex-shrink:0}
+.cal-ring svg{transform:rotate(-90deg)}
+.cal-ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.cal-ring-num{font-size:22px;font-weight:700;line-height:1;color:#111}
+.cal-ring-lbl{font-size:10px;color:#888}
+.cal-stats{flex:1}
+.cal-stat-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.cal-stat-label{font-size:13px;color:#666}
+.cal-stat-val{font-size:13px;font-weight:600;color:#111}
+.macro-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1rem}
+.macro-card{background:#fff;border-radius:12px;padding:.9rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.macro-val{font-size:18px;font-weight:700;line-height:1.1}
+.macro-goal{font-size:11px;color:#aaa;margin-bottom:.4rem}
+.macro-bar-bg{height:5px;background:#f0f0f0;border-radius:99px;overflow:hidden}
+.macro-bar-fill{height:100%;border-radius:99px;transition:width .6s ease}
+.macro-name{font-size:11px;font-weight:600;color:#666;margin-top:.4rem}
+.section-title{font-size:15px;font-weight:600;color:#111;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between}
+.add-btn{background:#16a34a;color:#fff;border:none;border-radius:8px;padding:.35rem .75rem;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.25rem}
+.add-btn:hover{background:#15803d}
+.micro-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem}
+.micro-card{background:#fff;border-radius:12px;padding:.8rem;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.micro-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.micro-name{font-size:12px;font-weight:500;color:#444}
+.micro-pct{font-size:12px;font-weight:700}
+.micro-bar{height:4px;background:#f0f0f0;border-radius:99px;overflow:hidden}
+.micro-fill{height:100%;border-radius:99px}
+.meals-card{background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:1rem}
+.meal-section{margin-bottom:1rem}
+.meal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.meal-label{font-size:13px;font-weight:600;color:#555;display:flex;align-items:center;gap:.4rem}
+.meal-label i{font-size:15px}
+.meal-cal{font-size:12px;color:#aaa}
+.food-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid #f5f5f0}
+.food-item:last-child{border-bottom:none}
+.food-name{font-size:13px;color:#333}
+.food-macros{font-size:11px;color:#aaa}
+.food-cals{font-size:13px;font-weight:600;color:#333}
+.remove-food{background:none;border:none;color:#ddd;cursor:pointer;font-size:16px;padding:.1rem .3rem}
+.remove-food:hover{color:#ef4444}
+.empty-meal{font-size:12px;color:#ccc;padding:.5rem 0;font-style:italic}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:1.5rem;width:90%;max-width:400px;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:1.25rem;color:#111}
+.search-input{width:100%;padding:.6rem .9rem;border:1.5px solid #e0e0e0;border-radius:var(--radius);font-size:14px;margin-bottom:.75rem;outline:none}
+.search-input:focus{border-color:#16a34a}
+.food-list{display:grid;gap:.5rem;max-height:280px;overflow-y:auto}
+.food-option{display:flex;justify-content:space-between;align-items:center;padding:.6rem .8rem;border:1px solid #f0f0f0;border-radius:8px;cursor:pointer;transition:background .15s}
+.food-option:hover{background:#f0fdf4;border-color:#bbf7d0}
+.food-opt-name{font-size:13px;font-weight:500;color:#222}
+.food-opt-info{font-size:11px;color:#aaa}
+.food-opt-cal{font-size:13px;font-weight:700;color:#16a34a}
+.modal-footer{display:flex;gap:.75rem;margin-top:1rem}
+.cancel-btn{flex:1;padding:.6rem;border:1.5px solid #e0e0e0;background:#fff;border-radius:var(--radius);font-size:14px;cursor:pointer}
+.meal-select{width:100%;padding:.5rem .8rem;border:1.5px solid #e0e0e0;border-radius:var(--radius);font-size:14px;margin-bottom:.75rem;outline:none}
+
+/* TIPS */
+.tip-card{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:12px;padding:1rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:.75rem}
+.tip-icon{font-size:20px;color:#16a34a;flex-shrink:0}
+.tip-text{font-size:13px;color:#166534;line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboard">
+<div class="ob-card">
+  <div class="ob-logo">NutriTrack</div>
+  <div class="ob-sub">Your personalized nutrition companion</div>
+
+  <!-- Step 1: Goal -->
+  <div class="step active" id="step1">
+    <div class="step-num">Step 1 of 4</div>
+    <div class="step-title">What's your goal?</div>
+    <div class="goal-grid">
+      <div class="goal-btn" onclick="selectGoal('lose')" id="g-lose">
+        <i class="ti ti-trending-down" style="color:#3b82f6"></i>
+        <span>Lose weight</span>
+      </div>
+      <div class="goal-btn" onclick="selectGoal('maintain')" id="g-maintain">
+        <i class="ti ti-scale" style="color:#f97316"></i>
+        <span>Maintain</span>
+      </div>
+      <div class="goal-btn" onclick="selectGoal('gain')" id="g-gain">
+        <i class="ti ti-trending-up" style="color:#22c55e"></i>
+        <span>Gain weight</span>
+      </div>
+    </div>
+    <button class="ob-btn" onclick="nextStep(1)">Continue</button>
+  </div>
+
+  <!-- Step 2: Body Info -->
+  <div class="step" id="step2">
+    <div class="step-num">Step 2 of 4</div>
+    <div class="step-title">Tell us about yourself</div>
+    <div class="field"><label>Age</label><input type="number" id="age" placeholder="e.g. 22" min="10" max="100"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+      <div class="field"><label>Weight (kg)</label><input type="number" id="weight" placeholder="e.g. 70" min="30" max="300"></div>
+      <div class="field"><label>Height (cm)</label><input type="number" id="height" placeholder="e.g. 175" min="100" max="250"></div>
+    </div>
+    <div class="field"><label>Gender</label>
+      <select id="gender">
+        <option value="">Select gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </div>
+    <button class="ob-btn" onclick="nextStep(2)">Continue</button>
+  </div>
+
+  <!-- Step 3: Activity -->
+  <div class="step" id="step3">
+    <div class="step-num">Step 3 of 4</div>
+    <div class="step-title">How active are you?</div>
+    <div class="activity-opts">
+      <div class="act-opt" onclick="selectActivity('sedentary',1.2)" id="a-sedentary">
+        <i class="ti ti-armchair"></i>
+        <div><div class="act-label">Sedentary</div><div class="act-sub">Little or no exercise</div></div>
+      </div>
+      <div class="act-opt" onclick="selectActivity('light',1.375)" id="a-light">
+        <i class="ti ti-walk"></i>
+        <div><div class="act-label">Lightly active</div><div class="act-sub">Exercise 1–3 days/week</div></div>
+      </div>
+      <div class="act-opt" onclick="selectActivity('moderate',1.55)" id="a-moderate">
+        <i class="ti ti-run"></i>
+        <div><div class="act-label">Moderately active</div><div class="act-sub">Exercise 3–5 days/week</div></div>
+      </div>
+      <div class="act-opt" onclick="selectActivity('very',1.725)" id="a-very">
+        <i class="ti ti-barbell"></i>
+        <div><div class="act-label">Very active</div><div class="act-sub">Hard exercise 6–7 days/week</div></div>
+      </div>
+    </div>
+    <button class="ob-btn" onclick="nextStep(3)">Continue</button>
+  </div>
+
+  <!-- Step 4: Name -->
+  <div class="step" id="step4">
+    <div class="step-num">Step 4 of 4</div>
+    <div class="step-title">Last step — what's your name?</div>
+    <div class="field"><label>Your name</label><input type="text" id="username" placeholder="e.g. Kishore"></div>
+    <button class="ob-btn" onclick="finishOnboard()">Start tracking</button>
+  </div>
+</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="top-bar">
+    <div class="top-logo"><i class="ti ti-leaf"></i> NutriTrack</div>
+    <div style="text-align:right">
+      <div style="font-size:14px;font-weight:600" id="greet-name"></div>
+      <div class="top-date" id="today-date"></div>
+    </div>
+  </div>
+
+  <div id="plan-badge-wrap"></div>
+
+  <div id="tip-wrap"></div>
+
+  <!-- Calorie Ring Card -->
+  <div class="cal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem">
+      <div style="font-size:15px;font-weight:600;color:#111">Today's calories</div>
+      <div style="font-size:13px;color:#aaa" id="cal-remaining"></div>
+    </div>
+    <div class="cal-main">
+      <div class="cal-ring">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#f0f0f0" stroke-width="10"/>
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#22c55e" stroke-width="10"
+            stroke-dasharray="263.9" id="cal-arc" stroke-dashoffset="263.9" stroke-linecap="round"/>
+        </svg>
+        <div class="cal-ring-text">
+          <div class="cal-ring-num" id="cal-eaten">0</div>
+          <div class="cal-ring-lbl">eaten</div>
+        </div>
+      </div>
+      <div class="cal-stats">
+        <div class="cal-stat-row"><span class="cal-stat-label">Daily goal</span><span class="cal-stat-val" id="stat-goal">—</span></div>
+        <div class="cal-stat-row"><span class="cal-stat-label">Consumed</span><span class="cal-stat-val" id="stat-consumed">0 kcal</span></div>
+        <div class="cal-stat-row"><span class="cal-stat-label">Remaining</span><span class="cal-stat-val" id="stat-left" style="color:#22c55e">— kcal</span></div>
+        <div class="cal-stat-row"><span class="cal-stat-label">Protein target</span><span class="cal-stat-val" id="stat-protein">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Macros -->
+  <div class="section-title">Macronutrients</div>
+  <div class="macro-grid">
+    <div class="macro-card">
+      <div class="macro-goal" id="m-protein-goal">/ 0g</div>
+      <div class="macro-val" id="m-protein-val" style="color:#3b82f6">0g</div>
+      <div class="macro-bar-bg"><div class="macro-bar-fill" id="m-protein-bar" style="background:#3b82f6;width:0%"></div></div>
+      <div class="macro-name">Protein</div>
+    </div>
+    <div class="macro-card">
+      <div class="macro-goal" id="m-carb-goal">/ 0g</div>
+      <div class="macro-val" id="m-carb-val" style="color:#f97316">0g</div>
+      <div class="macro-bar-bg"><div class="macro-bar-fill" id="m-carb-bar" style="background:#f97316;width:0%"></div></div>
+      <div class="macro-name">Carbs</div>
+    </div>
+    <div class="macro-card">
+      <div class="macro-goal" id="m-fat-goal">/ 0g</div>
+      <div class="macro-val" id="m-fat-val" style="color:#a855f7">0g</div>
+      <div class="macro-bar-bg"><div class="macro-bar-fill" id="m-fat-bar" style="background:#a855f7;width:0%"></div></div>
+      <div class="macro-name">Fat</div>
+    </div>
+  </div>
+
+  <!-- Vitamins & Minerals -->
+  <div class="section-title">Vitamins & minerals</div>
+  <div class="micro-grid" id="micro-grid"></div>
+
+  <!-- Meals -->
+  <div class="meals-card">
+    <div class="section-title">
+      Meals
+      <button class="add-btn" onclick="openModal()"><i class="ti ti-plus"></i> Add food</button>
+    </div>
+    <div id="meals-list"></div>
+  </div>
+</div>
+
+<!-- Add Food Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-search"></i> Add food</div>
+    <select class="meal-select" id="meal-select">
+      <option value="Breakfast">Breakfast</option>
+      <option value="Lunch">Lunch</option>
+      <option value="Dinner">Dinner</option>
+      <option value="Snacks">Snacks</option>
+    </select>
+    <input type="text" class="search-input" id="food-search" placeholder="Search foods..." oninput="filterFoods()">
+    <div class="food-list" id="food-list"></div>
+    <div class="modal-footer">
+      <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const FOODS = [
+  {name:"Boiled rice (1 cup)",cal:206,p:4,c:45,f:0.4,vitC:0,vitD:0,vitB12:0,iron:2,calcium:3,fiber:0.6},
+  {name:"Chapati (1 piece)",cal:104,p:3,c:18,f:3,vitC:0,vitD:0,vitB12:0,iron:4,calcium:20,fiber:2},
+  {name:"Dal (1 cup)",cal:230,p:16,c:40,f:1,vitC:4,vitD:0,vitB12:0,iron:15,calcium:80,fiber:15},
+  {name:"Chicken breast (100g)",cal:165,p:31,c:0,f:3.6,vitC:0,vitD:4,vitB12:15,iron:4,calcium:1,fiber:0},
+  {name:"Egg (1 whole)",cal:78,p:6,c:0.6,f:5,vitC:0,vitD:6,vitB12:8,iron:3,calcium:3,fiber:0},
+  {name:"Banana (1 medium)",cal:105,p:1.3,c:27,f:0.4,vitC:17,vitD:0,vitB12:0,iron:2,calcium:1,fiber:3},
+  {name:"Apple (1 medium)",cal:95,p:0.5,c:25,f:0.3,vitC:14,vitD:0,vitB12:0,iron:1,calcium:1,fiber:4},
+  {name:"Full milk (1 cup)",cal:149,p:8,c:12,f:8,vitC:0,vitD:15,vitB12:18,iron:0,calcium:28,fiber:0},
+  {name:"Paneer (100g)",cal:265,p:18,c:3,f:20,vitC:0,vitD:3,vitB12:6,iron:2,calcium:20,fiber:0},
+  {name:"Curd/Yogurt (1 cup)",cal:100,p:17,c:11,f:0.7,vitC:2,vitD:4,vitB12:12,iron:1,calcium:30,fiber:0},
+  {name:"Oats (1 cup cooked)",cal:166,p:6,c:28,f:4,vitC:0,vitD:0,vitB12:0,iron:19,calcium:2,fiber:4},
+  {name:"Peanut butter (2 tbsp)",cal:188,p:8,c:6,f:16,vitC:0,vitD:0,vitB12:0,iron:3,calcium:1,fiber:2},
+  {name:"Salmon (100g)",cal:208,p:20,c:0,f:13,vitC:0,vitD:97,vitB12:51,iron:3,calcium:1,fiber:0},
+  {name:"Spinach (1 cup cooked)",cal:41,p:5,c:7,f:0.5,vitC:29,vitD:0,vitB12:0,iron:36,calcium:24,fiber:4},
+  {name:"Broccoli (1 cup)",cal:55,p:4,c:11,f:0.6,vitC:135,vitD:0,vitB12:0,iron:6,calcium:4,fiber:5},
+  {name:"Orange (1 medium)",cal:62,p:1.2,c:15,f:0.2,vitC:93,vitD:0,vitB12:0,iron:1,calcium:5,fiber:3},
+  {name:"Almonds (28g)",cal:164,p:6,c:6,f:14,vitC:0,vitD:0,vitB12:0,iron:5,calcium:8,fiber:4},
+  {name:"Brown bread (1 slice)",cal:69,p:3,c:12,f:1,vitC:0,vitD:0,vitB12:0,iron:6,calcium:3,fiber:2},
+  {name:"Idli (2 pieces)",cal:116,p:4,c:24,f:0.5,vitC:0,vitD:0,vitB12:0,iron:3,calcium:4,fiber:1},
+  {name:"Masala dosa",cal:206,p:5,c:31,f:8,vitC:4,vitD:0,vitB12:0,iron:5,calcium:3,fiber:2},
+  {name:"Sweet potato (1 medium)",cal:130,p:3,c:30,f:0.1,vitC:35,vitD:0,vitB12:0,iron:4,calcium:4,fiber:4},
+  {name:"Tuna (100g)",cal:132,p:28,c:0,f:1,vitC:0,vitD:26,vitB12:82,iron:5,calcium:1,fiber:0},
+  {name:"Greek yogurt (1 cup)",cal:130,p:22,c:9,f:0,vitC:0,vitD:0,vitB12:13,iron:0,calcium:19,fiber:0},
+  {name:"Protein shake (1 scoop)",cal:120,p:25,c:4,f:2,vitC:0,vitD:0,vitB12:0,iron:5,calcium:10,fiber:0},
+];
+
+const MICROS = [
+  {key:"vitC",name:"Vitamin C",color:"#f97316",unit:"mg",dv:90},
+  {key:"vitD",name:"Vitamin D",color:"#eab308",unit:"%DV",dv:100},
+  {key:"vitB12",name:"Vitamin B12",color:"#a855f7",unit:"%DV",dv:100},
+  {key:"iron",name:"Iron",color:"#ef4444",unit:"%DV",dv:100},
+  {key:"calcium",name:"Calcium",color:"#3b82f6",unit:"%DV",dv:100},
+  {key:"fiber",name:"Fiber",color:"#22c55e",unit:"g",dv:28},
+];
+
+let user={},goals={},meals={Breakfast:[],Lunch:[],Dinner:[],Snacks:[]};
+let selectedGoal='',activityFactor=0;
+let filteredFoods=[...FOODS];
+
+function selectGoal(g){
+  selectedGoal=g;
+  document.querySelectorAll('.goal-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('g-'+g).classList.add('selected');
+}
+function selectActivity(id,factor){
+  activityFactor=factor;
+  document.querySelectorAll('.act-opt').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('a-'+id).classList.add('selected');
+}
+function nextStep(n){
+  if(n===1&&!selectedGoal){alert('Please select a goal');return}
+  if(n===2){
+    const age=+document.getElementById('age').value;
+    const w=+document.getElementById('weight').value;
+    const h=+document.getElementById('height').value;
+    const g=document.getElementById('gender').value;
+    if(!age||!w||!h||!g){alert('Please fill all fields');return}
+    user={age,weight:w,height:h,gender:g};
+  }
+  if(n===3&&!activityFactor){alert('Please select activity level');return}
+  document.getElementById('step'+n).classList.remove('active');
+  document.getElementById('step'+(n+1)).classList.add('active');
+}
+function calcGoals(){
+  const {age,weight,height,gender}=user;
+  let bmr=gender==='male'?10*weight+6.25*height-5*age+5:10*weight+6.25*height-5*age-161;
+  let tdee=Math.round(bmr*activityFactor);
+  let calGoal=tdee,proteinG=Math.round(weight*1.8);
+  if(selectedGoal==='lose'){calGoal=tdee-500;proteinG=Math.round(weight*2.0)}
+  if(selectedGoal==='gain'){calGoal=tdee+400;proteinG=Math.round(weight*2.2)}
+  const carbG=Math.round((calGoal*0.45)/4);
+  const fatG=Math.round((calGoal*0.25)/9);
+  return{calGoal,proteinG,carbG,fatG,tdee};
+}
+function finishOnboard(){
+  const name=document.getElementById('username').value.trim();
+  if(!name){alert('Please enter your name');return}
+  user.name=name;
+  goals=calcGoals();
+  document.getElementById('onboard').style.display='none';
+  document.getElementById('app').style.display='block';
+  initApp();
+}
+function initApp(){
+  const now=new Date();
+  document.getElementById('greet-name').textContent='Hi, '+user.name+' 👋';
+  document.getElementById('today-date').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const goalLabels={lose:'Fat loss plan 🔥',maintain:'Maintenance plan ⚖️',gain:'Muscle gain plan 💪'};
+  document.getElementById('plan-badge-wrap').innerHTML=`<div class="plan-badge"><i class="ti ti-target"></i>${goalLabels[selectedGoal]}</div>`;
+  document.getElementById('stat-goal').textContent=goals.calGoal+' kcal';
+  document.getElementById('stat-protein').textContent=goals.proteinG+'g / day';
+  document.getElementById('m-protein-goal').textContent='/ '+goals.proteinG+'g';
+  document.getElementById('m-carb-goal').textContent='/ '+goals.carbG+'g';
+  document.getElementById('m-fat-goal').textContent='/ '+goals.fatG+'g';
+  renderMicroGrid();
+  renderMeals();
+  setTip();
+  updateDashboard();
+}
+function setTip(){
+  const tips={
+    lose:"Tip: High protein keeps you full and preserves muscle on a calorie deficit. Aim for lean meats, eggs, and legumes.",
+    maintain:"Tip: Balance is key. Eat a variety of whole foods and track consistently to stay on target.",
+    gain:"Tip: On a muscle-gain plan, don't skip carbs — they fuel your workouts and support recovery."
+  };
+  document.getElementById('tip-wrap').innerHTML=`<div class="tip-card"><i class="ti ti-bulb tip-icon"></i><div class="tip-text">${tips[selectedGoal]}</div></div>`;
+}
+function renderMicroGrid(){
+  const g=document.getElementById('micro-grid');
+  g.innerHTML=MICROS.map(m=>`
+    <div class="micro-card">
+      <div class="micro-top">
+        <div class="micro-name">${m.name}</div>
+        <div class="micro-pct" id="micro-pct-${m.key}" style="color:${m.color}">0%</div>
+      </div>
+      <div class="micro-bar"><div class="micro-fill" id="micro-bar-${m.key}" style="background:${m.color};width:0%"></div></div>
+    </div>`).join('');
+}
+function renderMeals(){
+  const ml=document.getElementById('meals-list');
+  const mealIcons={Breakfast:'ti-coffee',Lunch:'ti-salad',Dinner:'ti-bowl',Snacks:'ti-apple'};
+  ml.innerHTML=Object.keys(meals).map(m=>{
+    const items=meals[m];
+    const mCal=items.reduce((a,f)=>a+f.cal,0);
+    return`<div class="meal-section">
+      <div class="meal-header">
+        <div class="meal-label"><i class="ti ${mealIcons[m]}"></i> ${m}</div>
+        <div class="meal-cal">${mCal} kcal</div>
+      </div>
+      ${items.length===0?'<div class="empty-meal">Nothing logged yet</div>':items.map((f,i)=>`
+        <div class="food-item">
+          <div><div class="food-name">${f.name}</div><div class="food-macros">P: ${f.p}g · C: ${f.c}g · F: ${f.f}g</div></div>
+          <div style="display:flex;align-items:center;gap:.5rem">
+            <div class="food-cals">${f.cal} kcal</div>
+            <button class="remove-food" onclick="removeFood('${m}',${i})"><i class="ti ti-x"></i></button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+function updateDashboard(){
+  const all=[].concat(...Object.values(meals));
+  const totCal=all.reduce((a,f)=>a+f.cal,0);
+  const totP=all.reduce((a,f)=>a+f.p,0);
+  const totC=all.reduce((a,f)=>a+f.c,0);
+  const totF=all.reduce((a,f)=>a+f.f,0);
+  // Cal ring
+  const pct=Math.min(totCal/goals.calGoal,1);
+  const circ=263.9;
+  document.getElementById('cal-arc').style.strokeDashoffset=(circ*(1-pct)).toFixed(1);
+  document.getElementById('cal-eaten').textContent=totCal;
+  document.getElementById('stat-consumed').textContent=totCal+' kcal';
+  const left=goals.calGoal-totCal;
+  document.getElementById('stat-left').textContent=(left>=0?left:0)+' kcal';
+  document.getElementById('cal-remaining').textContent=left>=0?left+' kcal left':'🔴 Over by '+(Math.abs(left))+' kcal';
+  // Macros
+  document.getElementById('m-protein-val').textContent=totP.toFixed(0)+'g';
+  document.getElementById('m-carb-val').textContent=totC.toFixed(0)+'g';
+  document.getElementById('m-fat-val').textContent=totF.toFixed(0)+'g';
+  document.getElementById('m-protein-bar').style.width=Math.min(totP/goals.proteinG*100,100).toFixed(0)+'%';
+  document.getElementById('m-carb-bar').style.width=Math.min(totC/goals.carbG*100,100).toFixed(0)+'%';
+  document.getElementById('m-fat-bar').style.width=Math.min(totF/goals.fatG*100,100).toFixed(0)+'%';
+  // Micros
+  MICROS.forEach(m=>{
+    const tot=all.reduce((a,f)=>a+(f[m.key]||0),0);
+    const p=Math.min(Math.round(tot/m.dv*100),100);
+    document.getElementById('micro-pct-'+m.key).textContent=p+'%';
+    document.getElementById('micro-bar-'+m.key).style.width=p+'%';
+  });
+}
+function openModal(){
+  document.getElementById('food-search').value='';
+  filteredFoods=[...FOODS];
+  renderFoodList();
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function filterFoods(){
+  const q=document.getElementById('food-search').value.toLowerCase();
+  filteredFoods=FOODS.filter(f=>f.name.toLowerCase().includes(q));
+  renderFoodList();
+}
+function renderFoodList(){
+  const el=document.getElementById('food-list');
+  if(filteredFoods.length===0){el.innerHTML='<div style="text-align:center;color:#aaa;padding:1rem;font-size:13px">No results</div>';return}
+  el.innerHTML=filteredFoods.map(f=>`
+    <div class="food-option" onclick="addFood(${FOODS.indexOf(f)})">
+      <div><div class="food-opt-name">${f.name}</div><div class="food-opt-info">P: ${f.p}g · C: ${f.c}g · F: ${f.f}g</div></div>
+      <div class="food-opt-cal">${f.cal}</div>
+    </div>`).join('');
+}
+function addFood(idx){
+  const meal=document.getElementById('meal-select').value;
+  meals[meal].push({...FOODS[idx]});
+  renderMeals();
+  updateDashboard();
+  closeModal();
+}
+function removeFood(meal,idx){
+  meals[meal].splice(idx,1);
+  renderMeals();
+  updateDashboard();
+}
+</script>
+</body>
+</html>
